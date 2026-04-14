@@ -1,0 +1,153 @@
+﻿<Window x:Class="OAuthWpfTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:OAuthWpfTest.Core.ViewModels;assembly=OAuthWpfTest.Core"
+        xmlns:converters="clr-namespace:OAuthWpfTest.Views.Converters"
+        mc:Ignorable="d"
+        Title="AWS Cognito Login" Height="500" Width="600"
+        WindowStartupLocation="CenterScreen"
+        d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+        <converters:NullToVisibilityConverter x:Key="NullToVisibility" />
+        <converters:CountToVisibilityConverter x:Key="CountToVisibility" />
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0"
+                   Text="AWS Cognito Authentication"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20" />
+
+        <!-- Login Panel (shown when not logged in) -->
+        <StackPanel Grid.Row="1"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Visibility="{Binding IsLoggedIn, Converter={StaticResource InverseBoolToVisibility}}">
+            <TextBlock Text="Sign in with your AWS Cognito account"
+                       FontSize="16"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,20"
+                       Foreground="Gray" />
+            <Button Content="Sign In"
+                    Command="{Binding LoginCommand}"
+                    FontSize="16"
+                    Padding="30,10"
+                    HorizontalAlignment="Center" />
+        </StackPanel>
+
+        <!-- User Info Panel (shown when logged in) -->
+        <Border Grid.Row="1"
+                Visibility="{Binding CurrentUser, Converter={StaticResource NullToVisibility}}"
+                BorderBrush="LightGray"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20"
+                Margin="20,0">
+            <StackPanel>
+                <TextBlock Text="User Information"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,15" />
+
+                <!-- Name -->
+                <StackPanel Margin="0,0,0,10">
+                    <TextBlock Text="Name"
+                               FontSize="12"
+                               Foreground="Gray" />
+                    <TextBlock Text="{Binding CurrentUser.Name}"
+                               FontSize="16" />
+                </StackPanel>
+
+                <!-- Email -->
+                <StackPanel Margin="0,0,0,10">
+                    <TextBlock Text="Email"
+                               FontSize="12"
+                               Foreground="Gray" />
+                    <TextBlock Text="{Binding CurrentUser.Email}"
+                               FontSize="16" />
+                </StackPanel>
+
+                <!-- Roles -->
+                <StackPanel Margin="0,0,0,10">
+                    <TextBlock Text="Roles"
+                               FontSize="12"
+                               Foreground="Gray" />
+                    <ItemsControl ItemsSource="{Binding CurrentUser.Roles}"
+                                  Visibility="{Binding CurrentUser.Roles.Count, Converter={StaticResource CountToVisibility}}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#E3F2FD"
+                                        CornerRadius="4"
+                                        Padding="8,4"
+                                        Margin="0,2">
+                                    <TextBlock Text="{Binding}"
+                                               FontSize="14" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="No roles assigned"
+                               FontSize="14"
+                               Foreground="Gray"
+                               FontStyle="Italic">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentUser.Roles.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+
+                <Separator Margin="0,10" />
+
+                <Button Content="Sign Out"
+                        Command="{Binding LogoutCommand}"
+                        FontSize="14"
+                        Padding="20,8"
+                        HorizontalAlignment="Left" />
+            </StackPanel>
+        </Border>
+
+        <!-- Status Bar -->
+        <StackPanel Grid.Row="2" Margin="0,15,0,0">
+            <!-- Loading indicator -->
+            <ProgressBar IsIndeterminate="True"
+                         Height="4"
+                         Margin="0,0,0,8"
+                         Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+
+            <!-- Status message -->
+            <TextBlock Text="{Binding StatusMessage}"
+                       FontSize="12"
+                       Foreground="Gray"
+                       HorizontalAlignment="Center" />
+
+            <!-- Error message -->
+            <TextBlock Text="{Binding ErrorMessage}"
+                       FontSize="12"
+                       Foreground="Red"
+                       HorizontalAlignment="Center"
+                       TextWrapping="Wrap"
+                       Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibility}}"
+                       Margin="0,5,0,0" />
+        </StackPanel>
+    </Grid>
+</Window>
