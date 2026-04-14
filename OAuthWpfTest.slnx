@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OAuthWpfTest.Core/OAuthWpfTest.Core.csproj" />
+    <Project Path="src/OAuthWpfTest/OAuthWpfTest.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OAuthWpfTest.Tests/OAuthWpfTest.Tests.csproj" />
+  </Folder>
+</Solution>
